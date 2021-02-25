@@ -33,6 +33,8 @@ parser.add_argument('--num_gpus', type=int)
 parser.add_argument('--batch_size', type=int, default=16)
 parser.add_argument('--clip_grad', type=float, default=1.0)
 parser.add_argument("--dataset_basedir", help="Base directory where the dataset is located.", type=str)
+parser.add_argument("--concept_store", help="Concept store file", type=str)
+
 
 parser = pl.Trainer.add_argparse_args(parser)
 parser = SEXLNet.add_model_specific_args(parser)
