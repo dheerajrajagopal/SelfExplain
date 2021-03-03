@@ -57,6 +57,7 @@ class ClassificationDataset(Dataset):
         data = pd.read_json(self.data_path, orient="records", lines=True)
         self.sentences, self.answer_labels, self.nt_idx_matrix = [], [], []
         logging.info(f"Reading dataset file from {self.data_path}")
+        # print(data, len(data))
         for i, row in tqdm(data.iterrows(), total=len(data), desc="Reading dataset samples"):
             self.answer_labels.append(int(row["label"]))
             self.sentences.append(row["sentence"])
@@ -75,7 +76,7 @@ class ClassificationDataset(Dataset):
 
     def __getitem__(self, i):
         # We’ll pad at the batch level.
-        return (self.input_ids[i], self.nt_idx_matrix[i], self.answer_labels[i])
+        return (self.input_ids[i], self.token_type_ids[i], self.nt_idx_matrix[i], self.answer_labels[i])
 
 
 
@@ -95,7 +96,7 @@ class MyCollator(object):
         max_phrase_len = 0
         num_elems = len(batch)
         for i in range(num_elems):
-            tokens, idx_m, _ = batch[i]
+            tokens, _, idx_m, _ = batch[i]
             max_token_len = max(max_token_len, len(tokens))
             max_phrase_len = max(max_phrase_len, idx_m.size(0))
 
@@ -105,7 +106,7 @@ class MyCollator(object):
         nt_idx_matrix = []
 
         for i in range(num_elems):
-            toks, idx_matrix, label = batch[i]
+            toks, _, idx_matrix, label = batch[i]
             # idx_matrix = torch.tensor(idx_matrix).long()
             idx_matrix = self.pad_fn(nt_idx_matrix=idx_matrix,
                                      max_nt_len=max_phrase_len,
@@ -114,6 +115,7 @@ class MyCollator(object):
             tokens[i, :length] = torch.LongTensor(toks)
             tokens_mask[i, :length] = 1
             nt_idx_matrix.append(idx_matrix)
+            labels[i] = label
 
         padded_ndx_tensor = torch.stack(nt_idx_matrix, dim=0)
         return [tokens, tokens_mask, padded_ndx_tensor, labels]

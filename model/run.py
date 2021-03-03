@@ -58,7 +58,7 @@ lr_monitor = LearningRateMonitor(logging_interval='step')
 # Step 3: Start
 logging.info("Starting the training")
 checkpoint_callback = ModelCheckpoint(
-    filename='{epoch}-{step}-{val_acc_epoch:.2f}',
+    filename='{epoch}-{step}-{val_acc_epoch:.4f}',
     save_top_k=3,
     verbose=True,
     monitor='val_acc_epoch',
@@ -67,3 +67,4 @@ checkpoint_callback = ModelCheckpoint(
 
 trainer = pl.Trainer.from_argparse_args(args, callbacks=[checkpoint_callback], val_check_interval=0.5, gradient_clip_val=args.clip_grad, track_grad_norm=2)
 trainer.fit(model, dm)
+# trainer.test()

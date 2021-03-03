@@ -6,7 +6,6 @@ from pytorch_lightning.core.lightning import LightningModule
 from torch.optim import AdamW
 from transformers import AutoModel, AutoConfig
 from transformers.modeling_utils import SequenceSummary
-import torch.nn.functional as F
 
 from model.model_utils import TimeDistributed
 
@@ -28,8 +27,14 @@ class SEXLNet(LightningModule):
                                                         self.hparams.num_classes))
 
         self.topk =  self.hparams.topk
-        self.topk_gil_mlp = TimeDistributed(nn.Linear(config.d_model,
-                                                      self.hparams.num_classes))
+        # self.topk_gil_mlp = TimeDistributed(nn.Linear(config.d_model,
+        #                                               self.hparams.num_classes))
+
+        self.topk_gil_mlp = nn.Linear(config.d_model,self.hparams.num_classes)
+
+        self.multihead_attention = torch.nn.MultiheadAttention(config.d_model,
+                                                               dropout=0.2,
+                                                               num_heads=8)
 
         self.activation = nn.ReLU()
 
@@ -52,13 +57,13 @@ class SEXLNet(LightningModule):
                             help="Dimensionality of the each attention head.", default=256)
         parser.add_argument("--num_classes", type=float,
                             help="Number of classes.", default=2)
-        parser.add_argument("--lr", default=5e-4, type=float,
+        parser.add_argument("--lr", default=2e-5, type=float,
                             help="Initial learning rate.")
         parser.add_argument("--weight_decay", default=0.01, type=float,
                             help="Weight decay rate.")
         parser.add_argument("--warmup_prop", default=0., type=float,
                             help="Warmup proportion.")
-        parser.add_argument("--topk", default=5, type=int,
+        parser.add_argument("--topk", default=1000, type=int,
                             help="Topk GIL concepts")
         parser.add_argument("--lamda", default=0.01, type=float,
                             help="Lamda Parameter")
@@ -80,19 +85,22 @@ class SEXLNet(LightningModule):
         sentence_cls, hidden_state = self.forward_classifier(input_ids=tokens,
                                                              token_type_ids=tokens_mask,
                                                              attention_mask=tokens_mask)
-
         logits = self.classifier(sentence_cls)
 
         lil_logits = self.lil(hidden_state=hidden_state,
                               nt_idx_matrix=padded_ndx_tensor)
-        lil_logits = torch.mean(lil_logits, dim=1)
-        gil_logits = self.gil(pooled_input=sentence_cls)
+        lil_logits_mean = torch.mean(lil_logits, dim=1)
+        gil_logits, topk_indices = self.gil(pooled_input=sentence_cls)
 
-        logits = logits + self.lamda * lil_logits + self.gamma * gil_logits
+        logits = logits + self.lamda * lil_logits_mean + self.gamma * gil_logits
         predicted_labels = torch.argmax(logits, -1)
-        acc = torch.true_divide(
-            (predicted_labels == labels).sum(), labels.shape[0])
-        return logits, acc
+        if labels is not None:
+            acc = torch.true_divide(
+                (predicted_labels == labels).sum(), labels.shape[0])
+        else:
+            acc = None
+        return logits, acc, {"topk_indices": topk_indices,
+                             "lil_logits": lil_logits}
 
     def gil(self, pooled_input):
         batch_size = pooled_input.size(0)
@@ -100,19 +108,27 @@ class SEXLNet(LightningModule):
         _, topk_indices = torch.topk(inner_products, k=self.topk)
         topk_concepts = torch.index_select(self.concept_store, 0, topk_indices.view(-1))
         topk_concepts = topk_concepts.view(batch_size, self.topk, -1).contiguous()
-        gil_topk_logits = self.topk_gil_mlp(topk_concepts)
-        gil_logits = torch.mean(gil_topk_logits, dim=1)
-        return gil_logits
+
+        concat_pooled_concepts = torch.cat([pooled_input.unsqueeze(1), topk_concepts], dim=1)
+        attended_concepts, _ = self.multihead_attention(query=concat_pooled_concepts,
+                                                     key=concat_pooled_concepts,
+                                                     value=concat_pooled_concepts)
+
+        gil_topk_logits = self.topk_gil_mlp(attended_concepts[:,0,:])
+        # print(gil_topk_logits.size())
+        # gil_logits = torch.mean(gil_topk_logits, dim=1)
+        return gil_topk_logits, topk_indices
 
     def lil(self, hidden_state, nt_idx_matrix):
         phrase_level_hidden = torch.bmm(nt_idx_matrix, hidden_state)
         phrase_level_activations = self.activation(phrase_level_hidden)
+        phrase_level_activations = phrase_level_activations - self.activation(hidden_state[:,0,:].unsqueeze(1))
         phrase_level_logits = self.phrase_logits(phrase_level_activations)
         return phrase_level_logits
 
 
     def forward_classifier(self, input_ids: torch.Tensor, attention_mask: torch.Tensor, token_type_ids: torch.Tensor = None):
-        """Returns the pooled token from BERT
+        """Returns the pooled token
         """
         outputs = self.model(input_ids=input_ids,
                              token_type_ids=token_type_ids,
@@ -124,7 +140,7 @@ class SEXLNet(LightningModule):
 
     def training_step(self, batch, batch_idx):
         # Load the data into variables
-        logits, acc = self(batch)
+        logits, acc, _ = self(batch)
         loss = self.loss(logits, batch[-1])
         self.log('train_acc', acc, on_step=True,
                  on_epoch=True, prog_bar=True, sync_dist=True)
@@ -133,7 +149,7 @@ class SEXLNet(LightningModule):
 
     def validation_step(self, batch, batch_idx):
         # Load the data into variables
-        logits, acc = self(batch)
+        logits, acc, _ = self(batch)
 
         loss_f = nn.CrossEntropyLoss()
         loss = loss_f(logits, batch[-1])
@@ -146,7 +162,7 @@ class SEXLNet(LightningModule):
 
     def test_step(self, batch, batch_idx):
         # Load the data into variables
-        logits, acc = self(batch)
+        logits, acc, _ = self(batch)
 
         loss_f = nn.CrossEntropyLoss()
         loss = loss_f(logits, batch[-1])
