@@ -1,4 +1,4 @@
-export DATA_FOLDER='data/CHECK/'
+export DATA_FOLDER='data/'
 export TOKENIZER_NAME='xlnet-base-cased'
 export MAX_LENGTH=5
 
