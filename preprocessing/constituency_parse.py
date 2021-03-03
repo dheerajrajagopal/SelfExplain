@@ -9,7 +9,7 @@ from nltk.tree import ParentedTree
 
 class ParseTree():
     def __init__(self, tokenizer_name, cached_parses=None):
-        self.parser = benepar.Parser('benepar_en2')
+        self.parser = benepar.Parser('benepar_en3')
         if 'roberta' in tokenizer_name:
             self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer_name)
         if 'xlnet' in tokenizer_name:
