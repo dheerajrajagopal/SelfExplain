@@ -7,7 +7,7 @@
 
 ## Preprocess to get POS-tagged data
 
-Data for preprocessing 
+Data for preprocessing available in `data/` folder
 
 On a python shell, do the following for installing the parser
 
