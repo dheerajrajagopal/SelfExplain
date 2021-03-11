@@ -13,6 +13,6 @@ python preprocessing/store_parse_trees.py \
 
 python preprocessing/build_concept_store.py \
        -i $DATA_FOLDER/train_with_parse.json \
-       -o $DATA_FOLDER/concept_store.pkl \
+       -o $DATA_FOLDER/concept_store.pt \
        -m $TOKENIZER_NAME \
        -l $MAX_LENGTH
