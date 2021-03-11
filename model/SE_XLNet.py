@@ -63,14 +63,12 @@ class SEXLNet(LightningModule):
                             help="Weight decay rate.")
         parser.add_argument("--warmup_prop", default=0., type=float,
                             help="Warmup proportion.")
-        parser.add_argument("--topk", default=1000, type=int,
+        parser.add_argument("--topk", default=10, type=int,
                             help="Topk GIL concepts")
         parser.add_argument("--lamda", default=0.01, type=float,
                             help="Lamda Parameter")
         parser.add_argument("--gamma", default=0.01, type=float,
                             help="Gamma parameter")
-        parser.add_argument(
-            "--model_name", default='xlnet-base-cased',  help="Model to use.")
         return parser
 
     def configure_optimizers(self):

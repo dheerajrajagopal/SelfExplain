@@ -20,7 +20,7 @@ def get_train_steps(dm):
 rlimit = resource.getrlimit(resource.RLIMIT_NOFILE)
 resource.setrlimit(resource.RLIMIT_NOFILE, (4096, rlimit[1]))
 # init: important to make sure every node initializes the same weights
-SEED = 43
+SEED = 18
 np.random.seed(SEED)
 random.seed(SEED)
 pl.utilities.seed.seed_everything(SEED)
@@ -34,7 +34,7 @@ parser.add_argument('--batch_size', type=int, default=16)
 parser.add_argument('--clip_grad', type=float, default=1.0)
 parser.add_argument("--dataset_basedir", help="Base directory where the dataset is located.", type=str)
 parser.add_argument("--concept_store", help="Concept store file", type=str)
-
+parser.add_argument("--model_name", default='xlnet-base-cased', help="Model to use.")
 
 parser = pl.Trainer.add_argparse_args(parser)
 parser = SEXLNet.add_model_specific_args(parser)
