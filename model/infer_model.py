@@ -9,8 +9,8 @@ import pandas as pd
 import resource
 from argparse import ArgumentParser
 
-from model.SE_XLNet import SEXLNet
-from model.data import ClassificationData
+from SE_XLNet import SEXLNet
+from data import ClassificationData
 
 
 def load_model(ckpt, batch_size):

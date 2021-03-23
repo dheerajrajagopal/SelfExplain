@@ -6,8 +6,8 @@ import pytorch_lightning as pl
 import logging
 from argparse import ArgumentParser
 import resource
-from model.data import ClassificationData
-from model.SE_XLNet import SEXLNet
+from data import ClassificationData
+from SE_XLNet import SEXLNet
 
 def get_train_steps(dm):
   total_devices = args.num_gpus * args.num_nodes
@@ -35,6 +35,9 @@ parser.add_argument('--clip_grad', type=float, default=1.0)
 parser.add_argument("--dataset_basedir", help="Base directory where the dataset is located.", type=str)
 parser.add_argument("--concept_store", help="Concept store file", type=str)
 parser.add_argument("--model_name", default='xlnet-base-cased', help="Model to use.")
+parser.add_argument("--gamma", default=0.01, type=float, help="Gamma parameter")
+parser.add_argument("--lamda", default=0.01, type=float, help="Lamda Parameter")
+parser.add_argument("--topk", default=100, type=int,help="Topk GIL concepts")
 
 parser = pl.Trainer.add_argparse_args(parser)
 parser = SEXLNet.add_model_specific_args(parser)

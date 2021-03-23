@@ -7,7 +7,7 @@ from torch.optim import AdamW
 from transformers import AutoModel, AutoConfig
 from transformers.modeling_utils import SequenceSummary
 
-from model.model_utils import TimeDistributed
+from model_utils import TimeDistributed
 
 
 class SEXLNet(LightningModule):
@@ -61,14 +61,8 @@ class SEXLNet(LightningModule):
                             help="Initial learning rate.")
         parser.add_argument("--weight_decay", default=0.01, type=float,
                             help="Weight decay rate.")
-        parser.add_argument("--warmup_prop", default=0., type=float,
+        parser.add_argument("--warmup_prop", default=0.01, type=float,
                             help="Warmup proportion.")
-        parser.add_argument("--topk", default=10, type=int,
-                            help="Topk GIL concepts")
-        parser.add_argument("--lamda", default=0.01, type=float,
-                            help="Lamda Parameter")
-        parser.add_argument("--gamma", default=0.01, type=float,
-                            help="Gamma parameter")
         return parser
 
     def configure_optimizers(self):
@@ -77,6 +71,7 @@ class SEXLNet(LightningModule):
     
     def forward(self, batch):
         self.concept_store = self.concept_store.to(self.model.device)
+        # print(self.concept_store.size(), self.hparams.concept_store)
         tokens, tokens_mask, padded_ndx_tensor, labels = batch
 
         # step 1: encode the sentence

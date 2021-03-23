@@ -1,4 +1,4 @@
-export DATA_FOLDER='data/'
+export DATA_FOLDER='data/SST-2-XLNet'
 export TOKENIZER_NAME='xlnet-base-cased'
 export MAX_LENGTH=5
 

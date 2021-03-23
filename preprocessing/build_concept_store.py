@@ -40,8 +40,8 @@ def concept_store(model_name, input_file_name, output_folder, max_concept_length
 
     concept_tensor = torch.cat(concept_tensor, dim=0)
 
-    torch.save(concept_tensor, f'{output_folder}/concept_store.pt')
-    with open(f'{output_folder}/concept_idx.json', 'w') as out_file:
+    torch.save(concept_tensor, f'{output_folder}/concept_store_all_train.pt')
+    with open(f'{output_folder}/concept_idx_all_train.json', 'w') as out_file:
         json.dump(concept_idx,out_file)
 
     return

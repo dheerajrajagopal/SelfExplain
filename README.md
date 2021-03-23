@@ -6,7 +6,7 @@
 - [x] GIL interpret output (Inference)
 - [] LIL interpret output (Inference)
 
-## Preprocess to get POS-tagged data
+## Preprocessing
 
 Data for preprocessing available in `data/` folder
 
@@ -38,3 +38,7 @@ sh scripts/run_self_explain.sh
         --batch_size $BS \
         --paths_output_loc $PATH_TO_OUTPUT_PREDS
  ```
+
+## Demo 
+
+Coming Soon ... 

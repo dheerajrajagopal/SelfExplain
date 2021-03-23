@@ -10,7 +10,7 @@ import pandas as pd
 from transformers import AutoTokenizer
 from tqdm import tqdm
 
-from model.data_utils import pad_nt_matrix_roberta, pad_nt_matrix_xlnet
+from data_utils import pad_nt_matrix_roberta, pad_nt_matrix_xlnet
 
 
 class ClassificationData(pl.LightningDataModule):
