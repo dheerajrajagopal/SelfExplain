@@ -1,5 +1,6 @@
 # SelfExplain Framework
 
+The code for the SelfExplain framework (https://arxiv.org/pdf/2103.12279.pdf) 
 
 ## Preprocessing
 
@@ -37,3 +38,16 @@ sh scripts/run_self_explain.sh
 ## Demo 
 
 Coming Soon ... 
+
+## Citation 
+
+```
+@misc{rajagopal2021selfexplain,
+      title={SelfExplain: A Self-Explaining Architecture for Neural Text Classifiers}, 
+      author={Dheeraj Rajagopal and Vidhisha Balachandran and Eduard Hovy and Yulia Tsvetkov},
+      year={2021},
+      eprint={2103.12279},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
