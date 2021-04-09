@@ -1,11 +1,6 @@
 # SelfExplain Framework
 
 
-## Todo
-
-- [x] GIL interpret output (Inference)
-- [] LIL interpret output (Inference)
-
 ## Preprocessing
 
 Data for preprocessing available in `data/` folder

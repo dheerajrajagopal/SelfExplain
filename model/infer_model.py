@@ -55,10 +55,6 @@ def eval(model, dataloader, concept_map, dev_file, paths_output_loc: str = None)
             gil_overall.extend(gil_interpretations)
             lil_overall.extend(lil_interpretations)
 
-            print(gil_interpretations)
-            print(lil_interpretations)
-            print(dev_samples[i]["sentence"])
-            exit(0)
             total_evaluated += len(batch)
             total_correct += (acc.item() * len(batch))
             print(
@@ -92,6 +88,7 @@ def lil_interpret(logits, list_of_interpret_dict, dev_samples, current_idx):
             relevance_score = phrase_logits[argmax_sf] - sf_item[argmax_sf]
             if phrase_idx != 0:
                 lil_dict[phrase["phrase"]] = relevance_score
+        lil_dict = sorted(lil_dict.items(), key=lambda item: item[1], reverse=True)[:5]
         lil_outputs.append(lil_dict)
     return lil_outputs
 
