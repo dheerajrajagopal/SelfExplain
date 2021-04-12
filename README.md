@@ -34,7 +34,8 @@ sh scripts/run_self_explain.sh
         --ckpt $PATH_TO_BEST_DEV_CHECKPOINT \
         --concept_map $DATA_FOLDER/concept_idx.json \ 
         --batch_size $BS \
-        --paths_output_loc $PATH_TO_OUTPUT_PREDS
+        --paths_output_loc $PATH_TO_OUTPUT_PREDS \
+        --dev_file $PATH_TO_DEV_FILE
  ```
 
 ## Demo 
