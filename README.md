@@ -1,6 +1,6 @@
 # SelfExplain Framework
 
-The code for the SelfExplain framework (https://arxiv.org/pdf/2103.12279) 
+The code for the SelfExplain framework (https://arxiv.org/abs/2103.12279) 
 
 Currently, this repo supports SelfExplain-XLNet version for SST-2 dataset. The other datasets and models shown in the paper will be updated soon.
 
