@@ -25,6 +25,7 @@ class SEXLNet(LightningModule):
 
         self.phrase_logits = TimeDistributed(nn.Linear(config.d_model,
                                                         self.hparams.num_classes))
+        self.sequence_summary = SequenceSummary(config)
 
         self.topk =  self.hparams.topk
         # self.topk_gil_mlp = TimeDistributed(nn.Linear(config.d_model,
@@ -92,6 +93,7 @@ class SEXLNet(LightningModule):
                 (predicted_labels == labels).sum(), labels.shape[0])
         else:
             acc = None
+
         return logits, acc, {"topk_indices": topk_indices,
                              "lil_logits": lil_logits}
 
@@ -115,7 +117,8 @@ class SEXLNet(LightningModule):
     def lil(self, hidden_state, nt_idx_matrix):
         phrase_level_hidden = torch.bmm(nt_idx_matrix, hidden_state)
         phrase_level_activations = self.activation(phrase_level_hidden)
-        phrase_level_activations = phrase_level_activations - self.activation(hidden_state[:,0,:].unsqueeze(1))
+        pooled_seq_rep = self.sequence_summary(hidden_state).unsqueeze(1)
+        phrase_level_activations = phrase_level_activations - pooled_seq_rep
         phrase_level_logits = self.phrase_logits(phrase_level_activations)
         return phrase_level_logits
 
