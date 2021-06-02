@@ -4,6 +4,9 @@ import benepar
 import numpy as np
 
 from transformers import RobertaTokenizer, XLNetTokenizer, DistilBertTokenizer
+from transformers import BertTokenizer
+from transformers import RobertaTokenizerFast, XLNetTokenizerFast, DistilBertTokenizerFast
+from transformers import BertTokenizerFast
 from nltk.tree import ParentedTree
 
 
@@ -11,11 +14,17 @@ class ParseTree():
     def __init__(self, tokenizer_name, cached_parses=None):
         self.parser = benepar.Parser('benepar_en3')
         if 'roberta' in tokenizer_name:
-            self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer_name)
-        if 'xlnet' in tokenizer_name:
-            self.tokenizer = XLNetTokenizer.from_pretrained(tokenizer_name)
-        if 'distilbert' in tokenizer_name:
-            self.tokenizer = DistilBertTokenizer.from_pretrained(tokenizer_name)
+            self.tokenizer = RobertaTokenizerFast.from_pretrained(tokenizer_name)
+        elif 'xlnet' in tokenizer_name:
+            self.tokenizer = XLNetTokenizerFast.from_pretrained(tokenizer_name)
+        elif 'distilbert' in tokenizer_name:
+            self.tokenizer = DistilBertTokenizerFast.from_pretrained(tokenizer_name)
+        elif 'bert' in tokenizer_name:
+            self.tokenizer = BertTokenizerFast.from_pretrained(tokenizer_name)
+        else: 
+            print ('Tokenizer not found : ', tokenizer_name)
+            import sys
+            sys.exit(0)
         self.cached_parses = cached_parses
         self.TREE_HEIGHT = 0
         self.NGRAM_LIMIT = 1000
@@ -63,6 +72,9 @@ class ParseTree():
             return parsed_tree
 
         # tokenized_sent = self.tokenizer.tokenize(line[0])
+        tokenized = self.tokenizer(line[0], return_offsets_mapping = True)
+        tokenized_sent = self.tokenizer.convert_ids_to_tokens(tokenized['input_ids'])
+        offset_mapping = tokenized['offset_mapping']
         combined_text = [self.remove_non_ascii(x) for x in tokenized_sent]
         parsed_tree = self.parser.parse(sentence=combined_text)
         parsed_tree = ParentedTree.convert(parsed_tree)
@@ -70,7 +82,12 @@ class ParseTree():
         return parsed_tree
 
     def get_parse_tree_for_raw_sent(self, raw_sent):
-        tokenized_sent = self.tokenizer.tokenize(raw_sent)
+        #tokenized_sent = self.tokenizer.tokenize(raw_sent)
+        tokenized = self.tokenizer(raw_sent, return_offsets_mapping = True)
+        #import pdb; pdb.set_trace()
+        tokenized_sent = self.tokenizer.convert_ids_to_tokens(tokenized['input_ids'])
+        offset_mapping = tokenized['offset_mapping']
+        combined_text = [self.remove_non_ascii(x) for x in tokenized_sent]
         combined_text = [self.remove_non_ascii(x) for x in tokenized_sent]
         combined_text = combined_text[:self.TOKEN_LIMIT]
 
@@ -84,7 +101,7 @@ class ParseTree():
                                                               num_tokens=num_tokens)
 
         nt_idx_matrix = [x['onehot'] for x in parsed_tree_as_list]
-        return parsed_tree_as_list, nt_idx_matrix
+        return parsed_tree_as_list, nt_idx_matrix, offset_mapping
 
     def get_one_hot_encoded_vector(self, parse_tree_list, num_tokens):
         for item in parse_tree_list:
