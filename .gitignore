@@ -4,3 +4,5 @@
 # large files
 data/*.json
 data/*.pt
+
+lightning_logs
