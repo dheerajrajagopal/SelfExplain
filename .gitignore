@@ -6,3 +6,4 @@ data/*.json
 data/*.pt
 
 lightning_logs
+__pycache__
