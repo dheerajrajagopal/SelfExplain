@@ -1,0 +1,11 @@
+old inference :
+python model/infer_model.py --ckpt lightning_logs/version_2/checkpoints/epoch=2-step=10524-val_acc_epoch=0.9278.ckpt --concept_map data/concept_idx.json --batch_size 16 --paths_output_loc output_loc_rj --dev_file data/dev_with_parse.json
+
+iclr train
+
+python model/run.py --dataset_basedir ../../data/ --lr 2e-5 --max_epochs 5 --gpus 2 --accelerator ddp --concept_store data/original_combined_data/concept_store.pt --batch_size 2 --num_gpus 2
+
+
+iclr inference
+
+python model/infer_model.py --ckpt lightning_logs/version_50/checkpoints/epoch\=3-step\=5930-val_keywords_f1_epoch\=0.0988.ckpt --concept_map data/original_combined_data/concept_idx.json --batch_size 4 --paths_output_loc output_iclr_rj --dev_file data/original_combined_data/dev_with_parse.json

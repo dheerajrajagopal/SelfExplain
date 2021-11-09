@@ -18,6 +18,55 @@ def concept_store(model_name, input_file_name, output_folder, max_concept_length
     config = config_dict[model_name]
     sequence_summary = SequenceSummary(config)
 
+    concepts = set()
+    concept_idx = OrderedDict()
+
+    idx = 0
+    with open(input_file_name, 'r') as input_file:
+        for i, line in enumerate(input_file):
+            json_line = json.loads(line)
+            for i, sentence in enumerate(json_line['sentences']):
+                #sentence = json_line['sentence']
+                sentence = sentence.strip().strip(' .')
+                if len(sentence.split()) <= max_concept_length:
+                    concepts.add(sentence)
+                    #concept_idx[idx] = sentence
+                    #idx += 1
+                for phrases in json_line['parse_trees'][i]:
+                    candph = phrases['phrase'].strip().strip(' .').strip()
+                    if len(candph) <= max_concept_length:
+                        concepts.add(candph)
+
+    idx = 0
+    for concept in concepts:
+        concept_idx[idx] = concept
+        idx += 1
+
+    concept_tensor = []
+    #import pdb; pdb.set_trace() # see concept_idx.values()
+    for batch in chunks(list(concept_idx.values()), n=batch_size): # yields successive n sized chunks from this list
+        inputs = tokenizer(batch, padding=True, return_tensors="pt")
+        for key, value in inputs.items():
+            inputs[key] = value.to('cuda')
+        outputs = model(**inputs)
+        pooled_rep = sequence_summary(outputs[0])
+        concept_tensor.append(pooled_rep.detach().cpu())
+
+    concept_tensor = torch.cat(concept_tensor, dim=0)
+
+    torch.save(concept_tensor, f'{output_folder}/concept_store.pt')
+    with open(f'{output_folder}/concept_idx.json', 'w') as out_file:
+        json.dump(concept_idx,out_file)
+
+    return
+
+def concept_store_old(model_name, input_file_name, output_folder, max_concept_length, batch_size=5):
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name).to('cuda')
+    model.eval()
+    config = config_dict[model_name]
+    sequence_summary = SequenceSummary(config)
+
     concept_idx = OrderedDict()
 
     idx = 0

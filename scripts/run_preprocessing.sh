@@ -1,4 +1,6 @@
-export DATA_FOLDER='data/SST-2-XLNet'
+#export DATA_FOLDER='data/SST-2-XLNet'
+# RUN USING LATESTENV ENVIRONMENT - torch171cu110
+export DATA_FOLDER='data/'
 export TOKENIZER_NAME='xlnet-base-cased'
 export MAX_LENGTH=5
 

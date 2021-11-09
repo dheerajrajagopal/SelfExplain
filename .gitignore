@@ -1,6 +1,6 @@
-# SCRIPTS for beaker
+*.swp
+*.out
 
-beaker/*
-run_beaker_jobs.sh
-
-demo/*
+# large files
+data/*.json
+data/*.pt
