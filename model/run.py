@@ -12,7 +12,10 @@ from SE_XLNet import SEXLNet
 def get_train_steps(dm):
   total_devices = args.num_gpus * args.num_nodes
   train_batches = len(dm.train_dataloader()) // total_devices
-  return (args.max_epochs * train_batches) // args.accumulate_grad_batches
+  if args.accumulate_grad_batches is None:
+    return (args.max_epochs * train_batches)
+  else:
+   return args.max_epochs * train_batches // args.accumulate_grad_batches
 
 
 
@@ -43,6 +46,7 @@ parser = pl.Trainer.add_argparse_args(parser)
 parser = SEXLNet.add_model_specific_args(parser)
 
 args = parser.parse_args()
+# print(args)
 args.num_gpus = len(str(args.gpus).split(","))
 
 
