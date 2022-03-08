@@ -13,8 +13,8 @@ from model_utils import TimeDistributed
 class SEXLNet(LightningModule):
     def __init__(self, hparams):
         super().__init__()
-        self.hparams = hparams
-        self.save_hyperparameters()
+        # self.hparams = hparams
+        self.save_hyperparameters(hparams)
         config = AutoConfig.from_pretrained(self.hparams.model_name)
         self.model = AutoModel.from_pretrained(self.hparams.model_name)
         self.pooler = SequenceSummary(config)
