@@ -41,6 +41,9 @@ export MAX_LENGTH=5
 
 ```
 
+Note if you wish to parse test.tsv please edit process_trec_dataset.py at line 57.
+Note we have provided data for SST-2 and SUBJ.
+
 ## Training
 
 For training, please edit data path and control other parameters.
