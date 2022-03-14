@@ -59,8 +59,7 @@ python model/run.py --dataset_basedir data/RoBERTa-SST-2 \
                          --lr 2e-5  --max_epochs 5 \
                          --gpus 1 \
                          --model_name roberta-base \
-                         --concept_store data/SUBJ-Rob/concept_store.pt \
-                         --accelerator ddp \
+                         --concept_store data/RoBERTa-SST-2/concept_store.pt \
                          --topk 5 \
                          --gamma 0.1 \
                          --lamda 0.1
