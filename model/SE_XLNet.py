@@ -18,7 +18,7 @@ class SEXLNet(LightningModule):
 
         # initialize config
         config = None
-        
+
         print(self.hparams.model_name)
         if self.hparams.model_name == "xlnet-base-cased":
 
@@ -89,8 +89,6 @@ class SEXLNet(LightningModule):
         self.concept_store = self.concept_store.to(self.model.device)
         # print(self.concept_store.size(), self.hparams.concept_store)
         tokens, tokens_mask, padded_ndx_tensor, labels = batch
-
-        sentence_cls, hidden_state = None
 
         # step 1: encode the sentence
         if self.hparams.model_name == "xlnet-base-cased":

@@ -33,7 +33,7 @@ Please comfirm MAX_LENGTH because this will affect the number of concepts. If MA
 small and average length for dataset is long, you may end up in training errors.
 
 Example:
-``` run_self_explain.sh
+``` run_preprocessing.sh
 
 export DATA_FOLDER='data/SST-2-XLNet'
 export TOKENIZER_NAME='xlnet-base-cased'
