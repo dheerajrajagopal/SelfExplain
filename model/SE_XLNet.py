@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from pytorch_lightning.core.lightning import LightningModule
 from torch.optim import AdamW
-from transformers import AutoModel, AutoConfig, RobertaConfig, RobertaModel, RobertaForMaskedLM
+from transformers import AutoModel, AutoConfig, RobertaConfig, RobertaModel
 from transformers.modeling_utils import SequenceSummary
 
 from model_utils import TimeDistributed
@@ -28,7 +28,7 @@ class SEXLNet(LightningModule):
         else:
             config = RobertaConfig()
 
-            self.model = RobertaForMaskedLM.from_pretrained(self.hparams.model_name)
+            self.model = RobertaModel.from_pretrained(self.hparams.model_name)
             config = self.model.config
             config.d_model = config.hidden_size
             config.dropout = 0.2
