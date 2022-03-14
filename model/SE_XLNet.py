@@ -31,6 +31,7 @@ class SEXLNet(LightningModule):
             self.model = RobertaForMaskedLM.from_pretrained(self.hparams.model_name)
             config = self.model.config
             config.d_model = config.hidden_size
+            config.dropout = 0.2
 
         self.pooler = SequenceSummary(config)
 
