@@ -7,7 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 import pandas as pd
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, RobertaTokenizer
 from tqdm import tqdm
 
 from data_utils import pad_nt_matrix_roberta, pad_nt_matrix_xlnet
@@ -19,7 +19,13 @@ class ClassificationData(pl.LightningDataModule):
         self.basedir = basedir
         self.batch_size = batch_size
         self.num_workers = num_workers
-        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, do_lower_case=True)
+        
+        print(tokenizer_name)
+        if tokenizer_name == "xlnet-base-cased":
+            self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, do_lower_case=True)
+        else:
+            self.tokenizer = RobertaTokenizer.from_pretrained(tokenizer_name)
+
         self.collator = MyCollator(tokenizer_name)
 
     def train_dataloader(self):

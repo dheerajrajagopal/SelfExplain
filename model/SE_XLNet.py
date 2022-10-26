@@ -4,7 +4,7 @@ import torch
 import torch.nn as nn
 from pytorch_lightning.core.lightning import LightningModule
 from torch.optim import AdamW
-from transformers import AutoModel, AutoConfig
+from transformers import AutoModel, AutoConfig, RobertaConfig, RobertaModel
 from transformers.modeling_utils import SequenceSummary
 
 from model_utils import TimeDistributed
@@ -13,10 +13,26 @@ from model_utils import TimeDistributed
 class SEXLNet(LightningModule):
     def __init__(self, hparams):
         super().__init__()
-        self.hparams = hparams
-        self.save_hyperparameters()
-        config = AutoConfig.from_pretrained(self.hparams.model_name)
-        self.model = AutoModel.from_pretrained(self.hparams.model_name)
+        # self.hparams = hparams
+        self.save_hyperparameters(hparams)
+
+        # initialize config
+        config = None
+
+        print(self.hparams.model_name)
+        if self.hparams.model_name == "xlnet-base-cased":
+
+            config = AutoConfig.from_pretrained(self.hparams.model_name)
+            self.model = AutoModel.from_pretrained(self.hparams.model_name)
+
+        else:
+            config = RobertaConfig()
+
+            self.model = RobertaModel.from_pretrained(self.hparams.model_name)
+            config = self.model.config
+            config.d_model = config.hidden_size
+            config.dropout = 0.2
+
         self.pooler = SequenceSummary(config)
 
         self.classifier = nn.Linear(config.d_model, self.hparams.num_classes)
@@ -76,9 +92,14 @@ class SEXLNet(LightningModule):
         tokens, tokens_mask, padded_ndx_tensor, labels = batch
 
         # step 1: encode the sentence
-        sentence_cls, hidden_state = self.forward_classifier(input_ids=tokens,
-                                                             token_type_ids=tokens_mask,
+        if self.hparams.model_name == "xlnet-base-cased":
+            sentence_cls, hidden_state = self.forward_classifier(input_ids=tokens,
+                                                                token_type_ids=tokens_mask,
+                                                                attention_mask=tokens_mask)
+        else:
+            sentence_cls, hidden_state = self.forward_classifier(input_ids=tokens,
                                                              attention_mask=tokens_mask)
+
         logits = self.classifier(sentence_cls)
 
         lil_logits = self.lil(hidden_state=hidden_state,

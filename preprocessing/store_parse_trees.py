@@ -3,7 +3,7 @@ import csv
 import json
 from typing import Dict
 
-from preprocessing.constituency_parse import ParseTree
+from constituency_parse import ParseTree
 
 
 class ParsedDataset(object):
@@ -48,8 +48,8 @@ def main():
 
     # Read input files from folder
     for file_split in ['train','dev']:
-        input_file_name = args.data_dir + file_split + '.tsv'
-        output_file_name = args.data_dir + file_split + '_with_parse.json'
+        input_file_name = args.data_dir + "/" + file_split + '.tsv'
+        output_file_name = args.data_dir + "/" + file_split + '_with_parse.json'
         parsed_data.read_and_store_from_tsv(input_file_name=input_file_name,
                                             output_file_name=output_file_name)
 
