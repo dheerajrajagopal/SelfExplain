@@ -94,12 +94,19 @@ Example:
 ## Citation 
 
 ```
-@misc{rajagopal2021selfexplain,
-      title={SelfExplain: A Self-Explaining Architecture for Neural Text Classifiers}, 
-      author={Dheeraj Rajagopal and Vidhisha Balachandran and Eduard Hovy and Yulia Tsvetkov},
-      year={2021},
-      eprint={2103.12279},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
+@inproceedings{rajagopal-etal-2021-selfexplain,
+    title = "{SELFEXPLAIN}: A Self-Explaining Architecture for Neural Text Classifiers",
+    author = "Rajagopal, Dheeraj  and
+      Balachandran, Vidhisha  and
+      Hovy, Eduard H  and
+      Tsvetkov, Yulia",
+    booktitle = "Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2021",
+    address = "Online and Punta Cana, Dominican Republic",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2021.emnlp-main.64",
+    doi = "10.18653/v1/2021.emnlp-main.64",
+    pages = "836--850",
 }
 ```
